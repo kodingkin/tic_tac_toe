@@ -33,9 +33,8 @@ function Game() {
         const gameBoardElm = document.querySelector("#gameboard");
         // check if the game is won
         for (let i = 0; i < 3; i++) {
-            const isHorzontalWin = (gameboard[i] === gameboard [i+1] && gameboard[i] === gameboard[i+2]) && gameboard[i] !== "-";
-            const isVerticalWin = (gameboard[i] === gameboard[i+3] && gameboard[i] === gameboard[i+6]) && gameboard[i] !== "-";
-
+            const isHorzontalWin = (gameboard[i*3] !== '-' && gameboard[i*3] === gameboard[i*3+1] && gameboard[i*3] === gameboard[i*3+2]);
+            const isVerticalWin = (gameboard[i] !== '-' && gameboard[i] === gameboard[i+3] && gameboard[i] === gameboard[i+6]);
             if (isHorzontalWin || isVerticalWin) {
                 this.winner = gameboard[i];
                 gameBoardElm.setAttribute("winner", this.winner);
