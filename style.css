@@ -28,8 +28,8 @@
 #gameboard {
     margin-top: 20px;
     display: grid;
-    grid-template-columns: 200px 200px 200px;
-    grid-template-rows: 200px 200px 200px;
+    grid-template-columns: 20vmin 20vmin 20vmin;
+    grid-template-rows: 20vmin 20vmin 20vmin;
     .playing-box {
         background-color: #e8f377;
         border: #7794f3 solid 3px;
@@ -38,7 +38,7 @@
         display: flex;
         justify-content: center;
         align-items: center;
-        font-size: 100px;
+        font-size: 10vmin;
         &:hover {
             background-color: #fdf503;
             transform: scale(1.05);
