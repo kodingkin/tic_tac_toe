@@ -1,57 +1,50 @@
-function confirmNew() {
-    if (!new.target) {
-        throw Error("You must use the 'new' operator to call the constructor");
-    }
-}
-
-function Gameboard() {
-    const create = () => {
-        const gameBoardArea = ['-','-','-','-','-','-','-','-','-'];
-        return gameBoardArea;
-    }
-    return { create }
-}
-
-function Players() {
-    const create = () => {
-        const players = ['-','-'];
-        return players;
-    }
-    return { create }
-}
-
-function Game(gameboard, players) {
+function Game() {
     const init = () => {
         // render dom
         // cache dom elm
     }
     const changeTurn = () => {
-        const gameBoard = document.querySelector("#gameboard");
-        const currentTurn = gameBoard.getAttribute("turn");
+        const gameBoardElm = document.querySelector("#gameboard");
+        const currentTurn = gameBoardElm.getAttribute("turn");
         if (currentTurn === "O") {
-            gameBoard.setAttribute("turn", "X")
+            gameBoardElm.setAttribute("turn", "X")
         } else {
-            gameBoard.setAttribute("turn", "O")
+            gameBoardElm.setAttribute("turn", "O")
         }
     }
-    const makeAMove = (gameboard, location, player) => {
+    const updateBoardArray = () => {
         // get the location and player
+        const gameboard = ['-','-','-','-','-','-','-','-','-'];
+        for (let i = 0; i < 9; i++) {
+            const boxselector = `#box${i.toString()}`
+            const box = document.querySelector(boxselector);
+            if (box.classList.contains("O")) {
+                gameboard[i] = "O";
+            } else if (box.classList.contains("X")) {
+                gameboard[i] = "X";
+            }
+        }
         // edit the board array
-        gameboard[location] = player;
         return gameboard;
     }
     const winner = null;
-    const isOver = (gameboard) => {
+    const isOver = (newestGBArray) => {
+        const gameboard = newestGBArray;
+        const gameBoardElm = document.querySelector("#gameboard");
         // check if the game is won
         for (let i = 0; i < 3; i++) {
-            const j = 0 + i * 3;
-            if ((gameboard[j] === gameboard [j+1] && gameboard[j] === gameboard[j+2]) || (gameboard[j] === gameboard[j+3] && gameboard[j] === gameboard[j+6])) {
-                this.winner = gameboard[j];
+            const isHorzontalWin = (gameboard[i] === gameboard [i+1] && gameboard[i] === gameboard[i+2]) && gameboard[i] !== "-";
+            const isVerticalWin = (gameboard[i] === gameboard[i+3] && gameboard[i] === gameboard[i+6]) && gameboard[i] !== "-";
+
+            if (isHorzontalWin || isVerticalWin) {
+                this.winner = gameboard[i];
+                gameBoardElm.setAttribute("winner", this.winner);
                 return true;
             }
         }
-        if ((gameboard[0] === gameboard[4] && gameboard [0] === gameboard[8]) || (gameboard[2] === gameboard[4] && gameboard[2] === gameboard[6])) {
+        if (((gameboard[0] === gameboard[4] && gameboard [0] === gameboard[8]) && gameboard[0] !== "-"|| (gameboard[2] === gameboard[4] && gameboard[2] === gameboard[6] && gameboard[2] !== "-"))) {
             this.winner = gameboard[4];
+            gameBoardElm.setAttribute("winner", this.winner);
             return true;
         }
         // check if the game is equal
@@ -64,6 +57,7 @@ function Game(gameboard, players) {
             isFull = true;
         }
         if (isFull === true) {
+            gameBoardElm.setAttribute("winner", "draw");
             return true;
         }
         return false;
@@ -73,22 +67,42 @@ function Game(gameboard, players) {
         // find out the winner
         // show the winner
     }
-    return { init, changeTurn, makeAMove, winner, isOver, endGame };
+    return { init, changeTurn, updateBoardArray, winner, isOver, endGame };
 }
 
-function DOMController(gameboard, game, players) {
+function DOMController(game) {
     const gameBoardDomElm = document.querySelector("#gameboard");
+    const winerElm = document.querySelector("#winner");
+    const reset = document.querySelector("#reset");
     const renderBoxes = () => {
         for (let i = 0; i < 9; i++) {
             const boxElm = document.createElement("div");
-            boxElm.id = `${i}`
+            boxElm.id = `box${i}`
             boxElm.classList.add("playing-box");
             boxElm.addEventListener("click", clickHandler);
             gameBoardDomElm.appendChild(boxElm);
         }
     }
+    const resetHandler = () => {
+        for (let i = 0; i < 9; i++) {
+            const boxselector = `#box${i.toString()}`
+            const box = document.querySelector(boxselector);
+            box.classList.remove("Played");
+            box.classList.remove("X");
+            box.classList.remove("O");
+            box.textContent = "";
+            gameBoardDomElm.setAttribute("turn", "O");
+            gameBoardDomElm.setAttribute("winner", "");
+            winerElm.classList.remove("visable");
+            reset.classList.remove("visable");
+            document.querySelector("#reset").removeEventListener("click", resetHandler)
+        }
+    }
     const clickHandler = (event) => {
         if (event.target.classList.contains("Played")) {
+            return;
+        }
+        if (document.querySelector("#gameboard").getAttribute("winner")) {
             return;
         }
         // click change display
@@ -103,15 +117,24 @@ function DOMController(gameboard, game, players) {
 
         // change box elm text
         event.target.textContent = currentTurn;
+        const updatedGameBoardArray = game.updateBoardArray();
+        if (game.isOver(updatedGameBoardArray) === true) {
+            const winner = document.querySelector("#gameboard").getAttribute("winner");
+            winerElm.classList.add("visable");
+            reset.classList.add("visable");
+            if (winerElm.textContent !== "draw") {
+                winerElm.textContent = `Game End! Winner is ${winner}`
+            } else {
+                winerElm.textContent = `Game End! Draw~`
+            }
+            document.querySelector("#reset").addEventListener("click", resetHandler)
+            return;
+        }
     }
-    return { gameBoardDomElm, renderBoxes }
+    return { gameBoardDomElm, renderBoxes, resetHandler }
 }
 
-const gameboardController =  new Gameboard;
-const playersController = new Players;
-const gameboard = gameboardController.create();
-const players = playersController.create();
-const newGame = new Game(gameboard, players);
-const DOM = new DOMController(gameboard, newGame, players);
+const newGame = new Game();
+const DOM = new DOMController(newGame);
 
 DOM.renderBoxes();
