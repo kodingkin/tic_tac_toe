@@ -1,0 +1,39 @@
+.game-container {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    .title-container {
+        margin-block: 50px;
+        font-size: 30px;
+    }
+}
+#gameboard {
+    display: grid;
+    grid-template-columns: 200px 200px 200px;
+    grid-template-rows: 200px 200px 200px;
+    .playing-box {
+        background-color: #e8f377;
+        border: #7794f3 solid 3px;
+        margin: 5px;
+        transition: transform 0.2s ease;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 100px;
+        &:hover {
+            background-color: #fdf503;
+            transform: scale(1.05);
+            z-index: 2;
+        }
+        &.expand {
+            transform: scale(1.08);
+        }
+        &.O {
+            background-color: #ee5959;
+        }
+        &.X {
+            background-color: #69a4f7;
+        }
+    }
+}
